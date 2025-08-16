@@ -1,28 +1,36 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# ワークフローの名前（GitHubのActionsタブで表示される）
+name: .NET Build and Test
 
-name: .NET
-
+# いつこのワークフローを実行するかを定義
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  push:                            # コードをpushしたとき
+    branches: [ "master" ]  # masterブランチに対してのみ実行
+  pull_request:                 # プルリクエストを作成/更新したとき
+    branches: [ "master" ]  # masterブランチ宛ての場合に実行
 
+# 実行するジョブの一覧
 jobs:
-  build:
+  build:                            # ジョブのID（任意の名前でOK）
+    runs-on: ubuntu-latest  # 実行環境（Linuxの最新版で実行）
+    steps:                         # ジョブの中で行う処理のステップ
 
-    runs-on: ubuntu-latest
-
-    steps:
+    # リポジトリのソースコードをチェックアウトする
     - uses: actions/checkout@v4
+ 
+    # .NET 8 をインストールして利用可能にする
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
+
+     # NuGetパッケージの依存関係を復元する
+    - name: Restore dependencies  
       run: dotnet restore
+      
+      # プロジェクトをビルド（--no-restoreでrestoreを省略）
     - name: Build
       run: dotnet build --no-restore
+      
+      # 単体テストを実行（事前にビルド済みなので--no-build）
     - name: Test
       run: dotnet test --no-build --verbosity normal
